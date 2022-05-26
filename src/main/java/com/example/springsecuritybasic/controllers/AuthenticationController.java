@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+
 
 @RestController
 public class AuthenticationController {
@@ -50,7 +52,12 @@ public class AuthenticationController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<?> saveUser(@RequestBody MyUser user) throws Exception {
-        return ResponseEntity.ok(userDetailsService.save(user).getUsername());
+        user = userDetailsService.save(user);
+        String appPath = new File(".").getCanonicalPath();
+        String userDirPath = appPath + "\\" + "user-files" + "\\" + user.getId();
+        new File( userDirPath ).mkdirs();
+
+        return ResponseEntity.ok( user.getUsername() );
     }
 
 }
