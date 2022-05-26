@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class FileController {
@@ -34,8 +36,6 @@ public class FileController {
 
     @RequestMapping(value = "/upload/file", method = RequestMethod.POST)
     public ResponseEntity<?> uploadFile( Authentication authentication, @RequestParam("file") MultipartFile file ){ //
-
-        System.out.println( authentication.getName() );
         MyUser user = userRepository.findByUsername( authentication.getName() );
 
         try {
@@ -55,6 +55,85 @@ public class FileController {
             return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body( e.getMessage() );
         }
         return ResponseEntity.ok( null );/**/
+    }
+
+
+    @RequestMapping(value = "/file/info/all", method = RequestMethod.GET)
+    public ResponseEntity<?> getFileInfoAll( Authentication authentication ){ //
+        MyUser user = userRepository.findByUsername( authentication.getName() );
+
+        List<FileInfo> ls = fileRepository.findByUserId( user.getId() );
+
+        return new ResponseEntity<List<FileInfo>>( ls, HttpStatus.OK );
+
+    }
+
+    @RequestMapping(value = "/file", method = RequestMethod.GET)
+    public ResponseEntity<?> getFile( Authentication authentication, Long FileId ){ //
+        MyUser user = userRepository.findByUsername( authentication.getName() );
+
+        FileInfo fileInfo = fileRepository.findById( FileId ).get();
+        if( fileInfo.getUserId() == user.getId() )
+        {
+            String fullPath = fileInfo.getPath() + "\\" + fileInfo.getName();
+            File file = new File( fullPath );
+            try {
+                byte[] bytes = Files.readAllBytes( file.toPath());
+                return new ResponseEntity<byte[]>( bytes, HttpStatus.OK  );
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return new ResponseEntity<Error>( HttpStatus.UNAUTHORIZED );
+    }
+
+    @RequestMapping(value = "/rename", method = RequestMethod.PUT)
+    public ResponseEntity<?> getFile( Authentication authentication, Long fileId, String newFileName ){ //
+        MyUser user = userRepository.findByUsername( authentication.getName() );
+
+        FileInfo fileInfo = fileRepository.findById( fileId ).get();
+        if( fileInfo.getUserId() == user.getId() )
+        {
+            String fullPath = fileInfo.getPath() + "\\" + fileInfo.getName();
+            String newFullPath = fileInfo.getPath() + "\\" + newFileName;
+            File file = new File( fullPath );
+            File file2 = new File(newFullPath);
+
+            if (file2.exists()){
+                return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).
+                        body( "Error: File exist!" );
+            }
+            if ( file.renameTo(file2) ) {
+                fileInfo.setName( newFileName );
+                fileRepository.save( fileInfo );
+                return new ResponseEntity<String>( newFileName, HttpStatus.OK );
+            }
+            else{
+                return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).
+                        body( "Error: File can not renamed!" );
+            }
+
+        }
+        return new ResponseEntity<Error>( HttpStatus.UNAUTHORIZED );
+
+
+
+    }
+
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteFile( Authentication authentication, Long fileId ){ //
+        MyUser user = userRepository.findByUsername( authentication.getName() );
+
+        FileInfo fileInfo = fileRepository.findById( fileId ).get();
+        if( fileInfo.getUserId() == user.getId() )
+        {
+            String fullPath = fileInfo.getPath() + "\\" + fileInfo.getName();
+            File file = new File( fullPath );
+            file.delete();
+            fileRepository.deleteById( fileInfo.getId() );
+        }
+        return new ResponseEntity<Error>( HttpStatus.UNAUTHORIZED );
     }
 
     private String getFileExtension( String name ) {
