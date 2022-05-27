@@ -52,6 +52,7 @@ public class AuthenticationController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<?> saveUser(@RequestBody MyUser user) throws Exception {
+        user.setRole( "ROLE_ADMIN" );
         user = userDetailsService.save(user);
         String appPath = new File(".").getCanonicalPath();
         String userDirPath = appPath + "\\" + "user-files" + "\\" + user.getId();
