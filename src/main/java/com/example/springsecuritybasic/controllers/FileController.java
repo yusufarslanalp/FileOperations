@@ -1,19 +1,13 @@
 package com.example.springsecuritybasic.controllers;
 
-import com.example.springsecuritybasic.UserRepository;
-import com.example.springsecuritybasic.models.AuthenticationRequest;
-import com.example.springsecuritybasic.models.AuthenticationResponse;
+import com.example.springsecuritybasic.repository.UserRepository;
 import com.example.springsecuritybasic.models.FileInfo;
 import com.example.springsecuritybasic.models.MyUser;
 import com.example.springsecuritybasic.repository.FileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,7 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("file")

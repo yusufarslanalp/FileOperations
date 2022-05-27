@@ -4,7 +4,7 @@ package com.example.springsecuritybasic.auth;
 import java.util.Arrays;
 import java.util.List;
 
-import com.example.springsecuritybasic.UserRepository;
+import com.example.springsecuritybasic.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
