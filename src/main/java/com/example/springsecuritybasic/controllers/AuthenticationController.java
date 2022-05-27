@@ -21,6 +21,7 @@ import java.io.File;
 
 
 @RestController
+@RequestMapping("auth")
 public class AuthenticationController {
 
     @Autowired
