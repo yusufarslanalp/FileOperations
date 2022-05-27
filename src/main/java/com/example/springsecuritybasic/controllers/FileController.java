@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("file")
 public class FileController {
 
     @Autowired
@@ -34,8 +35,8 @@ public class FileController {
     private FileRepository fileRepository;
 
 
-    @RequestMapping(value = "/upload/file", method = RequestMethod.POST)
-    public ResponseEntity<?> uploadFile( Authentication authentication, @RequestParam("file") MultipartFile file ){ //
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    public ResponseEntity<?> fileUpload( Authentication authentication, @RequestParam("file") MultipartFile file ){ //
         MyUser user = userRepository.findByUsername( authentication.getName() );
 
         try {
@@ -49,16 +50,16 @@ public class FileController {
             FileInfo fileInfo = new FileInfo( user.getId(), file.getOriginalFilename(),
                     filePath, fileExt ,file.getSize() );
             fileRepository.save( fileInfo );
+            return new ResponseEntity<FileInfo>( fileInfo, HttpStatus.OK );
 
         } catch ( Exception e) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body( e.getMessage() );
         }
-        return ResponseEntity.ok( null );/**/
     }
 
 
-    @RequestMapping(value = "/file/info/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/info/all", method = RequestMethod.GET)
     public ResponseEntity<?> getFileInfoAll( Authentication authentication ){ //
         MyUser user = userRepository.findByUsername( authentication.getName() );
 
@@ -68,11 +69,11 @@ public class FileController {
 
     }
 
-    @RequestMapping(value = "/file", method = RequestMethod.GET)
-    public ResponseEntity<?> getFile( Authentication authentication, Long FileId ){ //
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public ResponseEntity<?> getFile( Authentication authentication, Long fileId ){ //
         MyUser user = userRepository.findByUsername( authentication.getName() );
 
-        FileInfo fileInfo = fileRepository.findById( FileId ).get();
+        FileInfo fileInfo = fileRepository.findById( fileId ).get();
         if( fileInfo.getUserId() == user.getId() )
         {
             String fullPath = fileInfo.getPath() + "\\" + fileInfo.getName();
@@ -107,7 +108,7 @@ public class FileController {
             if ( file.renameTo(file2) ) {
                 fileInfo.setName( newFileName );
                 fileRepository.save( fileInfo );
-                return new ResponseEntity<String>( newFileName, HttpStatus.OK );
+                return new ResponseEntity<FileInfo>( fileInfo, HttpStatus.OK );
             }
             else{
                 return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).
@@ -132,6 +133,7 @@ public class FileController {
             File file = new File( fullPath );
             file.delete();
             fileRepository.deleteById( fileInfo.getId() );
+            return new ResponseEntity<FileInfo>( fileInfo, HttpStatus.OK );
         }
         return new ResponseEntity<Error>( HttpStatus.UNAUTHORIZED );
     }
