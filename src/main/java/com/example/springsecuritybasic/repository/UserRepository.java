@@ -1,4 +1,4 @@
-package com.example.springsecuritybasic;
+package com.example.springsecuritybasic.repository;
 
 
 import com.example.springsecuritybasic.models.MyUser;
