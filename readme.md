@@ -12,19 +12,19 @@ The project has a swagger documentation and a postman collection.
 You can import postman collection to test the project.
 postman collection file name is "FileOperations.postman_collection.json"
 
-###API
-<image src = "API.PNG">
+### API
+<image src = "API.png">
 
-##Usage
+## Usage
 
-###Register
+### Register
 <image src="Register.png">
 
 ### Authenticate
 
 <image src="authenticate.png">
 
-###Upload File
+### Upload File
 
 <image src="upload.png">
 
